@@ -6,7 +6,7 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Intro to MapView - Create a 2D map - 4.12</title>
+    <title>Timu</title>
     <style>
       html,
       body,
@@ -27,7 +27,7 @@
     <script>
         var lat = 43.39458400;
         var lng = -80.46622800;
-      require(["esri/Map", "esri/views/MapView"], function(Map, MapView) {
+      require(["esri/Map", "esri/views/MapView","esri/Graphic"], function(Map, MapView,Graphic) {
         var map = new Map({
           basemap: {
             portalItem: {
@@ -39,9 +39,33 @@
         var view = new MapView({
           container: "viewDiv",
           map: map,
-          zoom: 12,
+          zoom: 15,
           center: [lng, lat] // longitude, latitude
         });
+
+        // First create a point geometry (Gym Facility)
+        var point = {
+            type: "point", // autocasts as new Point()
+            longitude: lng,
+            latitude: lat
+        };
+
+        // Create a symbol for drawing the point
+      var markerSymbol = {
+        type: "picture-marker", // autocasts as new SimpleMarkerSymbol()
+        	url: "images/mikasa-sm.png",
+			width: "25px",
+			height: "25px"
+      };
+
+      // Create a graphic and add the geometry and symbol to it
+      var pointGraphic = new Graphic({
+        geometry: point,
+        symbol: markerSymbol
+      });
+
+      view.graphics.add(pointGraphic);
+
       });
     </script>
   </head>
