@@ -25,6 +25,7 @@
         padding: 7px 8px;
         font-size: 16px;
         cursor: pointer;
+        display: none;
       }
       .btn:hover {
         background-color: #f0f0f0;
@@ -39,138 +40,140 @@
 
     <script>
 
-        var lat = 43.39458400;
-        var lng = -80.46622800;
-        var isInitialView = true;
-        var view, track, startGraphic;
-        require(["esri/Map", "esri/views/MapView","esri/Graphic","esri/widgets/Expand",
-                  "esri/widgets/Track","esri/geometry/Multipoint", 
-                  "dijit/form/Button","dojo/dom-construct"], 
-        function(Map, MapView,Graphic,Expand,Track,Multipoint,Button,
-                 domConstruct) {
-            var map = new Map({
-                basemap: {
-                    portalItem: {
-                        id: "fae788aa91e54244b161b59725dcbb2a"
-                    }
-                }
-            });
+      var lat = 43.39458400;
+      var lng = -80.46622800;
+      var isInitialView = true;
+      var view, track, startGraphic;
 
-            view = new MapView({
-                container: "viewDiv",
-                map: map,
-                zoom: 15,
-                center: [lng, lat] // longitude, latitude
-            });
-
-            // First create a point geometry (Gym Facility)
-            var point = {
-                type: "point", // autocasts as new Point()
-                longitude: lng,
-                latitude: lat
-            };
-
-            // Create a symbol for drawing the point
-            var markerSymbol = {
-                type: "picture-marker", // autocasts as new SimpleMarkerSymbol()
-                url: "images/mikasa-sm.png",
-                width: "25px",
-                height: "25px"
-            };
-
-            // Create a graphic and add the geometry and symbol to it
-            var pointGraphic = new Graphic({
-                geometry: point,
-                symbol: markerSymbol
-            });
-
-            view.graphics.add(pointGraphic);
-
-            track = new Track({ view: view, goToLocationEnabled: false });
-
-            var button = new Button({  // "dijit/form/Button"
-              //label: "I'm a dijit!"
-              showLabel:false,
-              iconClass: "esri-icon-directions",
-              onClick: function(){
-                  // Do something:
-                  console.log("dude");
-              }
-            });
-            button.startup();
-
-            var node = domConstruct.create("div", {
-              innerHTML: "<button id='directions' class='btn' title='Directions'><i class='esri-icon-directions'></i></button>"
-            });
-
-            view.ui.add([track, node],"bottom-right");
-            // view.ui.add([
-            //   new Expand({
-            //     expandIconClass: "esri-icon-directions",
-            //     expanded: false,
-            //     view: view,
-            //     content: node,
-            //     group: "bottom-right"
-            //   }),
-            //     new Expand({
-            //             view: view,
-            //             content: track,
-            //             group: "bottom-right",
-            //             expanded: false
-            //         })
-            //         ]
-            //     , "bottom-right");
-
-            track.on("track", function(trackEvent){
-                    console.log(trackEvent);
-                    console.log("track: %s", view.scale);
-                    console.log(view.graphics.items);
-                    if(isInitialView)
-                    {
-                      
-                      zoomToAOI(trackEvent);
-                      isInitialView = false;
-                    }
-            })
-            //document.getElementById("directions").addEventListener("click", getDirections);
-            
-            view.when(function(){
-              // This function will execute once the promise is resolved
-              //console.log("when")
-              document.getElementById("directions").addEventListener("click", getDirections);
-            
-            }, function(error){
-              // This function will execute if the promise is rejected due to an error
-              console.log("when")
-            });
-            
-            function zoomToAOI(trackEvent)
-            {
-              var multiPt = new Multipoint({points:[[trackEvent.position.coords.longitude, trackEvent.position.coords.latitude],[lng,lat]]});
-              //console.log(multiPt);
-              view.goTo(multiPt.extent);
-
-              var point = {
-                type: "point", // autocasts as new Point()
-                longitude: trackEvent.position.coords.longitude,
-                latitude: trackEvent.position.coords.latitude,
-              };
-              
-              // Create a graphic and add the geometry and symbol to it
-              startGraphic = new Graphic({
-                  geometry: point
-              });
-
-              //track.stop();
+      require(["esri/Map", "esri/views/MapView","esri/Graphic","esri/widgets/Expand",
+              "esri/widgets/Track","esri/geometry/Multipoint","dojo/dom-construct"], 
+      function(Map, MapView,Graphic,Expand,Track,Multipoint,domConstruct) 
+      {
+          
+        var map = new Map({
+          basemap: {
+            portalItem: {
+                id: "fae788aa91e54244b161b59725dcbb2a" //OSM vector basemap
             }
-
-            function getDirections(){
-              //console.log("directions");
-              console.log(startGraphic);
-              track.stop();
-            }
-
+          }
         });
+
+        view = new MapView({
+          container: "viewDiv",
+          map: map,
+          zoom: 15,
+          center: [lng, lat] // longitude, latitude
+        });
+
+        // First create a point geometry (Gym Facility)
+        var point = {
+          type: "point", // autocasts as new Point()
+          longitude: lng,
+          latitude: lat
+        };
+
+        // Create a symbol for drawing the point
+        var markerSymbol = {
+          type: "picture-marker", // autocasts as new SimpleMarkerSymbol()
+          url: "images/mikasa-sm.png",
+          width: "22px",
+          height: "22px"
+        };
+
+        // Create a graphic and add the geometry and symbol to it
+        var pointGraphic = new Graphic({
+          geometry: point,
+          symbol: markerSymbol
+        });
+
+        view.graphics.add(pointGraphic);
+
+        track = new Track({ view: view, goToLocationEnabled: false });
+
+          // var button = new Button({  // "dijit/form/Button"
+          //   //label: "I'm a dijit!"
+          //   showLabel:false,
+          //   iconClass: "esri-icon-directions",
+          //   onClick: function(){
+          //       // Do something:
+          //       console.log("dude");
+          //   }
+          // });
+          // button.startup();
+
+        var node = domConstruct.create("div", {
+          innerHTML: "<button id='directions' class='btn' title='Directions'><i class='esri-icon-directions'></i></button>"
+        });
+
+        view.ui.add([track, node],"bottom-right");
+          // view.ui.add([
+          //   new Expand({
+          //     expandIconClass: "esri-icon-directions",
+          //     expanded: false,
+          //     view: view,
+          //     content: node,
+          //     group: "bottom-right"
+          //   }),
+          //     new Expand({
+          //             view: view,
+          //             content: track,
+          //             group: "bottom-right",
+          //             expanded: false
+          //         })
+          //         ]
+          //     , "bottom-right");
+
+        track.on("track", function(trackEvent){
+          // console.log(trackEvent);
+          // console.log("track: %s", view.scale);
+          // console.log(view.graphics.items);
+          if(isInitialView)
+          {
+            zoomToAOI(trackEvent);
+            isInitialView = false;
+          }
+        });
+          
+        view.when(function(){
+          // This function will execute once the promise is resolved
+          //console.log("when")
+          document.getElementById("directions").addEventListener("click", getDirections);
+        
+        }, function(error){
+          // This function will execute if the promise is rejected due to an error
+          console.log("when")
+        });
+          
+        function zoomToAOI(trackEvent)
+        {
+          var multiPt = new Multipoint({points:[[trackEvent.position.coords.longitude, trackEvent.position.coords.latitude],[lng,lat]]});
+          //console.log(multiPt);
+          view.goTo(multiPt.extent);
+
+          var point = {
+            type: "point", // autocasts as new Point()
+            longitude: trackEvent.position.coords.longitude,
+            latitude: trackEvent.position.coords.latitude,
+          };
+          
+          // Create a graphic and add the geometry and symbol to it
+          startGraphic = new Graphic({
+            geometry: point
+          });
+
+          //track.stop();
+
+          document.getElementById("directions").style.display = "block";
+        }
+
+        function getDirections(){
+          //console.log("directions");
+          track.stop();
+          track.goToLocationEnabled = true;
+          console.log(startGraphic);
+        }
+
+      });
         
     </script>
   </head>
