@@ -173,6 +173,12 @@
               view.graphics.removeAt(1);
           }
         });
+        
+        track.watch("tracking", function(enabled) {
+          //console.log(enabled);
+          if (!enabled && view.graphics.items.length === 2)
+            view.graphics.items[1].visible = true;
+        });
           
         view.when(function(){
           // This function will execute once the promise is resolved
