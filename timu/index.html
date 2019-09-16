@@ -167,6 +167,11 @@
             zoomToAOI(trackEvent);
             isInitialView = false;
           }
+          else
+          {
+            if (view.graphics.items.length === 3)
+              view.graphics.removeAt(1);
+          }
         });
           
         view.when(function(){
