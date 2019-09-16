@@ -42,6 +42,8 @@
 
       var lat = 43.39458400;
       var lng = -80.46622800;
+      var venue = "Huron Heights SS";
+		  var address = "1825 Strasburg Rd, Kitchener, ON N2R 1S3";
       var isInitialView = true;
       var view, track, startGraphic, endGraphic ,routeLayer, routeTask, routeParams;
 
@@ -118,7 +120,19 @@
         // Create a graphic and add the geometry and symbol to it
         var endGraphic = new Graphic({
           geometry: point,
-          symbol: markerSymbol
+          symbol: markerSymbol,
+          attributes: {venue: venue, address: address},
+          popupTemplate:{
+            title: venue,
+            content: [
+              {
+                type: "fields",
+                fieldInfos:[
+                  {fieldName: "address", label: "Address"}
+                ]
+              }
+            ]
+          }
         });
 
         view.graphics.add(endGraphic);
@@ -170,10 +184,10 @@
           else
           {
             if (view.graphics.items.length === 3)
-              view.graphics.items[1].visible = false;
+              view.graphics.items[1].visible = false
           }
         });
-        
+
         track.watch("tracking", function(enabled) {
           //console.log(enabled);
           if (!enabled && view.graphics.items.length === 2)
