@@ -258,6 +258,15 @@
           routeResult.symbol = routeSymbol;
           routeLayer.add(routeResult);
           view.graphics.add(startGraphic);
+	  displayDirections(data.routeResults[0]);
+        }
+	      
+	function displayDirections(routeResults)
+        {
+          //console.log(routeResults.directions.features.length)
+          routeResults.directions.features.forEach(function(feature) {
+            console.log(feature.attributes.text);
+          });
         }
 
       });
