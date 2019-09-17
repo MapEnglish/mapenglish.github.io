@@ -244,9 +244,9 @@
           console.log(startGraphic, endGraphic);
 
            // Execute the route task if 2 or more stops are input
+	  routeParams.stops.features.push(endGraphic);
           routeParams.stops.features.push(startGraphic);
-          routeParams.stops.features.push(endGraphic);
-
+          
           routeTask.solve(routeParams).then(showRoute);
           
 
