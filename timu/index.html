@@ -46,14 +46,16 @@
 		  var address = "1825 Strasburg Rd, Kitchener, ON N2R 1S3";
       var isInitialView = true;
       var view, track, startGraphic, endGraphic ,routeLayer, routeTask, routeParams;
+      var directionsNode;
 
       require(["esri/Map", "esri/views/MapView","esri/Graphic","esri/widgets/Expand",
               "esri/widgets/Track","esri/geometry/Multipoint","dojo/dom-construct",
-              "esri/layers/GraphicsLayer",
+              "dojo/dom-style", "esri/layers/GraphicsLayer",
         "esri/tasks/RouteTask",
         "esri/tasks/support/RouteParameters",
         "esri/tasks/support/FeatureSet"], 
-      function(Map, MapView,Graphic,Expand,Track,Multipoint,domConstruct, GraphicsLayer,
+      function(Map, MapView,Graphic,Expand,Track,Multipoint,domConstruct,
+        domStyle, GraphicsLayer,
         RouteTask,
         RouteParameters,
         FeatureSet) 
@@ -75,7 +77,7 @@
             // autocasts as new SpatialReference()
             wkid: 3857
           },
-          restrictionAttributes: ["Avoid Toll Roads"],
+          restrictionAttributes: ["Avoid Toll Roads", "Driving an Automobile"],
           returnDirections: true
         });
           
@@ -154,7 +156,21 @@
           innerHTML: "<button id='directions' class='btn' title='Directions'><i class='esri-icon-directions'></i></button>"
         });
 
-        view.ui.add([track, node],"bottom-right");
+        directionsNode = domConstruct.create("div", {
+          innerHTML: "Directions go here"
+        });
+
+        domStyle.set(directionsNode, "width", "400px");
+        domStyle.set(directionsNode, "background-color", "white");
+        domStyle.set(directionsNode, "padding", "10px");
+
+        view.ui.add([track, node, new Expand({
+                view: view,
+                expandTooltip: "Directions",
+                content: directionsNode,
+                group: "bottom-right",
+                expanded: false
+              })],"bottom-right");
           // view.ui.add([
           //   new Expand({
           //     expandIconClass: "esri-icon-directions",
@@ -198,6 +214,7 @@
           // This function will execute once the promise is resolved
           //console.log("when")
           document.getElementById("directions").addEventListener("click", getDirections);
+          document.getElementsByClassName('esri-expand esri-widget')[0].style.display = 'none';
         
         }, function(error){
           // This function will execute if the promise is rejected due to an error
@@ -232,9 +249,9 @@
             }
           });
 
+          //document.getElementById("directions").style.display = "block";
+          getDirections();
           //track.stop();
-
-          document.getElementById("directions").style.display = "block";
         }
 
         function getDirections(){
@@ -243,13 +260,12 @@
           track.goToLocationEnabled = true;
           console.log(startGraphic, endGraphic);
 
-           // Execute the route task if 2 or more stops are input
-	  routeParams.stops.features.push(endGraphic);
+          // Execute the route task if 2 or more stops are input
           routeParams.stops.features.push(startGraphic);
-          
+          routeParams.stops.features.push(endGraphic);
+                  
           routeTask.solve(routeParams).then(showRoute);
           
-
         }
 
          // Adds the solved route to the map as a graphic
@@ -258,15 +274,30 @@
           routeResult.symbol = routeSymbol;
           routeLayer.add(routeResult);
           view.graphics.add(startGraphic);
-	  displayDirections(data.routeResults[0]);
+
+          displayDirections(data.routeResults[0])
+
+          document.getElementsByClassName('esri-expand esri-widget')[0].style.display = 'block';
+
+          track.stop();
         }
-	      
-	function displayDirections(routeResults)
+
+        function displayDirections(routeResults)
         {
           //console.log(routeResults.directions.features.length)
+          var directions = "";
+          directions += "<b>Distance:</b> " + Math.round (routeResults.route.attributes["Total_Kilometers"]) + " km<br>"
+          directions += "<b>Time:</b> " + Math.round (routeResults.route.attributes["Total_TravelTime"]) + " mins<br>"
+          directions += "<ul>";
+
           routeResults.directions.features.forEach(function(feature) {
             console.log(feature.attributes.text);
+            //directions += "<br>" + feature.attributes.text;
+            directions += "<li>" + feature.attributes.text + "</li>";
           });
+          directions += "<ul>";
+
+          directionsNode.innerHTML = directions;
         }
 
       });
@@ -278,3 +309,4 @@
     <div id="viewDiv"></div>
   </body>
 </html>
+
