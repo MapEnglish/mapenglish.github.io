@@ -221,8 +221,8 @@
             if(routeResult && routeResult.geometry)
             {
               // https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-geometryEngine.html#nearestCoordinate
-              // var nearest = GeometryEngine.nearestCoordinate(routeResult.geometry, graphic.geometry);
-              // graphic.geometry = nearest.coordinate;
+              var nearest = GeometryEngine.nearestCoordinate(routeResult.geometry, graphic.geometry);
+              graphic.geometry = nearest.coordinate;
             }
 
           }
